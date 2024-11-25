@@ -28,7 +28,7 @@ def frequency_domain_features(signal, sample_rate):
     median_freq = frequencies[np.searchsorted(cumulative_magnitudes, cumulative_magnitudes[-1] / 2)]
     return mean_amp, sd, median_freq
 
-def bach_features(xyz, sample_rate):
+def bach_features(xyz, sample_rate, features_to_keep=None):
 
     feats = {}
     quartiles = [0, 25, 50, 75, 100]  # Percentiles for quartiles
@@ -60,5 +60,8 @@ def bach_features(xyz, sample_rate):
     for i, axis in enumerate('xyz'):
         signal = xyz[:, i]
         feats[f'{axis}MeanFreqAmp'], feats[f'{axis}SDFreq'], feats[f'{axis}MedianFreq'] = frequency_domain_features(signal, sample_rate)
+    
+    if features_to_keep:
+        feats = {k: feats[k] for k in feats.keys() if k in features_to_keep} # keep kept features in same order
 
     return feats
