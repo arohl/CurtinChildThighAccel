@@ -29,6 +29,7 @@
 |LSTM-CNN #7|minmax|0.930±0.039|0.778±0.108|0.796±0.111|0.764±0.103|0.883±0.073|
 
 **Table S1**  LOSO-CV performance using pure windows. Subject-wise accuracy, precision, recall, F1, and Cohen's kappa (κ) reported (mean ± SD). 
+<br>
 
 Focusing first on the accuracy, all the LSTM-CNN models with stddev normalisation were significantly lower (~0.88) than all of the rest of the models examined, which had accuracies > 0.9. This large impact of normalisation on the LSTM-CNN models was unexpected, given that it has negligible impact on the KNN and SVN models. The highest accuracy was observed for XGBoost, followed by the LSTM-CNN \#3–\#7 with minmax and KNN. However, the performance of models is often assessed by the F1 score or Cohen's kappa in ML and DL. XGBoost was the highest performing model on both of these metrics. All of the LSTM-CNN models had lower F1 scores than the ML models but Cohen's kappa ordering was very similar to that found for accuracy. In the medical sciences, balanced accuracy is often used. For the multi-class case, there are several definitions, but the one employed in scikit-learn is equivalent to the average recall used here. Table S1 shows that the BRF model performed best on this metric. Although the LSTM-CNN models didn't top any metric, we were interested in understanding their performance relative to the ML models in more detail. Consequently, the XGBoost, BRF, and LSTM-CNN \#3 models were trained on impure windows.
 
@@ -42,4 +43,51 @@ Focusing first on the accuracy, all the LSTM-CNN models with stddev normalisatio
 |LSTM-CNN #3 (minmax)|0.900±0.045|0.756±0.085|0.778±0.088|0.740±0.094|0.844±0.081|
 
 **Table S2**  LOSO-CV performance using impure windows. Subject-wise accuracy, precision, recall, F1, and Cohen's kappa (κ) reported (mean ± SD).
+<br>
+
+### Optimizing ML Models Through Removing Features
+
+| XGBoost        | BRF             |
+|----------------|-----------------|
+| xMax           | xMax            |
+| xMean          | xMean           |
+| xMeanFreqAmp   | xMeanFreqAmp    |
+| xMed           | xMed            |
+| xMin           | xMedianFreq     |
+| xQ25           | xMin            |
+| xQ75           | xQ25            |
+| xSDFreq        | xQ75            |
+| xSkew          | xSDFreq         |
+| xStd           | xStd            |
+| xTotalE        | xTotalE         |
+| xyCorr         | xZCR            |
+| yMax           | yMax            |
+| yMeanFreqAmp   | yMeanFreqAmp    |
+| yMedianFreq    | yStd            |
+| yQ75           | zMax            |
+| yStd           | zMean           |
+| yTotalE        | zMeanFreqAmp    |
+| yZCR           | zMed            |
+| zMax           | zMedianFreq     |
+| zMean          | zMin            |
+| zMed           | zQ25            |
+| zQ25           | zQ75            |
+| zQ75           | zSDFreq         |
+| zSkew          | zStd            |
+| zStd           | zZCR            |
+| zxCorr         |                 |
+
+**Table S3**  The features included in the BRF and XGBoost models after feature selection.
+<br>
+
+|Model|Accuracy|Precision|Recall|F1|κ|
+|-----|--------|---------|------|--|-|
+|XGBoost|0.893±0.044|0.797±0.042|0.741±0.038|0.765±0.045|0.842±0.060|
+|BRF|0.860±0.060|0.711±0.058|0.790±0.047|0.745±0.066|0.799±0.080|
+
+|XGBoost|BRF|
+|-------|---|
+|![](SI_images/test_reduced_xgb.pdf)|![](SI_images/test_reduced_brf.pdf)|
+
+**Table S4**  Performance on the test set using reduced feature models with impure windows. Subject-wise accuracy, precision, recall, F1, and Cohen's kappa (κ) reported (mean ± SD), and the associated confusion matrices.
 
