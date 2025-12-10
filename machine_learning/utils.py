@@ -295,3 +295,73 @@ def per_participant_metrics(Y_test, Y_test_pred, pid_test):
         report += f"{mean:.3f}±{std:.3f}  "
 
     return report
+
+def per_participant_per_class_metrics(Y_test, Y_test_pred, pid_test, labels, categories=None):
+    """ Calculate per-participant metrics with per-class breakdown.
+
+    Args:
+        Y_test (array-like): True labels
+        Y_test_pred (array-like): Predicted labels
+        pid_test (array-like): Participant IDs corresponding to each sample
+        labels (list): List of label indices to calculate metrics for
+        categories (list, optional): List of string names matching 'labels' order for metrics table.
+                                     If None, 'labels' will be used for display.
+
+    Returns:
+        str: Formatted report containing separate tables for each metric
+    """
+    unique_pids = np.unique(pid_test)
+
+    display_names = categories if categories is not None else [str(l) for l in labels]
+
+    width = max(12, max(len(s) for s in display_names) + 2)
+    report = ""
+
+    # Can't include accuracy or kappa here as they are not per-class metrics
+    metrics_config = [
+        ('PRECISION', precision_score),
+        ('RECALL',    recall_score),
+        ('F1',        f1_score)
+    ]
+
+    for name, func in metrics_config:
+        report += f"{'='*80}\nPER-PARTICIPANT {name}\n{'='*80}\n\n"
+
+        report += f"{'Participant':<12}" + "".join(f"{cat:<{width}}" for cat in display_names) + f"{'Macro Avg':<{width}}\n"
+        report += "-" * (12 + width * (len(labels) + 1)) + "\n"
+
+        data_matrix = []
+        row_stats = []
+
+        for pid in unique_pids:
+            mask = pid_test == pid
+            yt, yp = Y_test[mask], Y_test_pred[mask]
+
+            # Calculate participant's metrics for metric func
+            row = func(yt, yp, average=None, labels=labels, zero_division=np.nan)
+            # and macro average
+            row_stat = np.nanmean(row)
+
+            data_matrix.append(row)
+            row_stats.append(row_stat)
+
+            row_str = "".join((f"{v:<{width}.3f}" if not np.isnan(v) else f"{'N/A':<{width}}") for v in row)
+            stat_str = f"{row_stat:<{width}.3f}" if not np.isnan(row_stat) else f"{'N/A':<{width}}"
+            report += f"{pid:<12}{row_str}{stat_str}\n"
+
+        report += "-" * (12 + width * (len(labels) + 1)) + "\n"
+        data_matrix = np.array(data_matrix)
+
+        for stat_name, stat_func in [('Mean', np.nanmean), ('Std Dev', np.nanstd)]:
+            report += f"{stat_name:<12}"
+
+            for col_idx in range(len(labels)):
+                val = stat_func(data_matrix[:, col_idx])
+                report += f"{val:<{width}.3f}"
+
+            grand_val = stat_func(row_stats)
+            report += f"{grand_val:<{width}.3f}\n"
+
+        report += "\n"
+
+    return report
