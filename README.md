@@ -1,4 +1,4 @@
-### Notebooks for the paper "Machine and Deep Learning Classifiers for Activity Recognition in Children From Thigh-Worn Accelerometer Data", submitted to Sensors
+### Notebooks for the paper "Comparison of Deep Learning, Traditional Machine Learning, and Decision Tree Models for Activity Recognition in Children from Thigh-Worn Accelerometer Data" submitted to The Journal for the Measurement of Physical Behaviour
 
 There are two directories
 * *machine_learning* for the traditional ML models
